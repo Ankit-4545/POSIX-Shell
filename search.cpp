@@ -21,10 +21,10 @@ bool search(string curr,string file){
             closedir(dir);
             return true;
         }
-        string comp_path = curr + "/" + entry->d_name;
-        int x=stat(comp_path.c_str(),&buf);
+        string current=curr+"/"+entry->d_name;
+        int x=stat(current.c_str(),&buf);
         if(x==0 && S_ISDIR(buf.st_mode)){
-            if(search(comp_path,file)){
+            if(search(current,file)){
                 return true;
             }
         }
@@ -33,15 +33,15 @@ bool search(string curr,string file){
     return false;
 }
 
-void handle_search(){
+void handle_search(queue<string>argument){
     char cwd[256];
     string current=string(getcwd(cwd,256));
-    if(space_split.size()>2){
+    if(argument.size()>2){
         cout<<"Invalid arguments"<<endl;
         return;
     }
-    space_split.pop();
-    bool res=search(current,space_split.front());
-    if(res) cout<<"true"<<endl;
+    argument.pop();
+    bool res=search(current,argument.front());
+    if(res==true)cout<<"true"<<endl;
     else cout<<"false"<<endl;
 }

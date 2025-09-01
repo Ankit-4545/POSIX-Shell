@@ -9,7 +9,6 @@ using namespace std;
 string system_name;
 queue<string>command_split;
 queue<string>pipe_split;
-queue<string>space_split;
 string Home;
 
 string curr_dir(){
@@ -17,13 +16,7 @@ string curr_dir(){
     return string(getcwd(cwd,256));
 }
 
-void clear_queue(){
-    while(!space_split.empty()){
-        space_split.pop();
-    }
-}
-
-void handle_echo(){
+void handle_echo(queue<string>space_split){
     space_split.pop();
     while(!space_split.empty()){
         cout<<space_split.front()<<" ";
@@ -32,21 +25,16 @@ void handle_echo(){
     cout<<endl;
 }
 
-void handle_pwd(){
+void handle_pwd(queue<string>space_split){
     if(space_split.size()>1){
-        while(!space_split.empty()){
-            space_split.pop();
-        }
         cout<<"invalid command"<<endl;
         return;
     }
-    space_split.pop();
     char current_directory[256];
     if(getcwd(current_directory,256)==nullptr){
         cout<<"current directory not fetched"<<endl;
     }
     cout<<current_directory<<endl;
-    cout<<flush;
 }
 
 void print_prompt()
@@ -81,7 +69,7 @@ void print_prompt()
     system_name=(string)u_name+"@"+host_name+":"+str;
 }
 
-void handle_cd(){
+void handle_cd(queue<string>space_split){
     if(space_split.size()>2){
         cout<<"Invalid arguments"<<endl;
     }
@@ -99,7 +87,13 @@ void handle_cd(){
             }
         }
         else if(flag=="~"){
-            if(chdir(Home.c_str())!=0){
+            const char* home = getenv("HOME");
+            if(home==nullptr){
+                perror("Home is not fetched");
+                // clear_queue();
+                return;
+            }
+            if(chdir(home)!=0){
                 perror("cant reach home directory");
             }
         }
@@ -115,7 +109,37 @@ void handle_cd(){
             }   
         }
     }
-    clear_queue();
+    // clear_queue();
+}
+
+void execute_command(queue<queue<string>> pipeline_args, bool background) {
+    while (!pipeline_args.empty()) {
+        queue<string>argument= pipeline_args.front();
+        pipeline_args.pop();
+
+        if (argument.empty()) continue;
+
+        string cmd = argument.front();
+
+        if (cmd == "pwd") {
+            handle_pwd(argument);
+        }
+        else if (cmd == "cd") {
+            handle_cd(argument);
+        }
+        else if (cmd == "echo") {
+            handle_echo(argument);
+        }
+        else if (cmd == "ls") {
+            handle_ls(argument);
+        }
+        else if (cmd == "search") {
+            handle_search(argument);
+        }
+        else {
+            cout << "Invalid command " << cmd << endl;
+        }
+    }
 }
 
 void parser(char *input){
@@ -134,6 +158,16 @@ void parser(char *input){
     while(!command_split.empty()){
         string s=command_split.front();
         command_split.pop();
+
+        bool background = false;
+        if (!s.empty() && s.back() == '&') {
+            background = true;
+            s.pop_back(); 
+            while (!s.empty() && isspace(s.back())){ 
+                s.pop_back();
+            }
+        }
+
         char* command=new char[s.length()+1];
         strcpy(command,s.c_str());
         char* token2=strtok(command,delimiter2);
@@ -142,6 +176,8 @@ void parser(char *input){
             token2=strtok(nullptr,delimiter2);
         }
         delete[]command;
+
+        queue<queue<string>> pipe_argument;
         // Space seperated
         const char* delimiter3=" \t";
         while(!pipe_split.empty()){
@@ -150,36 +186,77 @@ void parser(char *input){
             char* command1=new char[s2.length()+1];
             strcpy(command1,s2.c_str());
             char* token3=strtok(command1,delimiter3);
+
+            queue<string>space;
+            string input_file = "";
+            string output_file = "";
+            bool append_mode = false;
+
             while(token3!=nullptr){
-                space_split.push(string(token3));
-                token3=strtok(nullptr,delimiter3);
+                string temp=string(token3);
+                if (temp == "<") {
+                    token3 = strtok(nullptr, delimiter3);
+                    if (token3) input_file = string(token3);
+                }
+                else if (temp == ">") {
+                    token3 = strtok(nullptr, delimiter3);
+                    if (token3) {
+                        output_file = string(token3);
+                        append_mode = false;
+                    }
+                }
+                else if (temp == ">>") {
+                    token3 = strtok(nullptr, delimiter3);
+                    if (token3) {
+                        output_file = string(token3);
+                        append_mode = true;
+                    }
+                }
+                else {
+                    space.push(temp);
+                }
+                token3 = strtok(nullptr, delimiter3);
             }
-            // To run each command handle
-            while(!space_split.empty()){
-                if(space_split.front()=="pwd"){
-                    handle_pwd();
-                    break;    
-                }
-                if(space_split.front()=="echo"){
-                    handle_echo();
-                    break;
-                }
-                if(space_split.front()=="cd"){
-                    handle_cd();
-                    break;
-                }
-                if(space_split.front()=="ls"){
-                    handle_ls();
-                    clear_queue();
-                    break;
-                }
-                else{
-                    cout<<"Invalid command"<<endl;
-                    clear_queue();
-                }
-            }
+            pipe_argument.push(space);
+
+            // // *** CHANGED: Temporary print redirection info (for testing) ***
+            // if (!input_file.empty()) {
+            //     cout << "Input redirection: " << input_file << endl;
+            // }
+            // if (!output_file.empty()) {
+            //     cout << "Output redirection: " << output_file<< (append_mode ? " (append mode)" : " (overwrite mode)") << endl;
+            // }
+            // // To run each command handle
+            // while(!space_split.empty()){
+            //     if(space_split.front()=="pwd"){
+            //         handle_pwd();
+            //         break;    
+            //     }
+            //     if(space_split.front()=="echo"){
+            //         handle_echo();
+            //         break;
+            //     }
+            //     if(space_split.front()=="cd"){
+            //         handle_cd();
+            //         break;
+            //     }
+            //     if(space_split.front()=="ls"){
+            //         handle_ls();
+            //         clear_queue();
+            //         break;
+            //     }
+            //     if(space_split.front()=="search"){
+            //         handle_search();
+            //         clear_queue();
+            //     }
+            //     else{
+            //         cout<<"Invalid command"<<endl;
+            //         clear_queue();
+            //     }
+            // }
             delete[] command1;
         }
+        execute_command(pipe_argument, background);
     }    
 }
 

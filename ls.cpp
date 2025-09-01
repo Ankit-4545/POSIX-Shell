@@ -222,28 +222,20 @@ void print_all_long_format(string present){
     }    
 }
 
-void handle_ls(){
-    if(space_split.size()==1){
+void handle_ls(queue<string>argument){
+    if(argument.size()==1){
         print_entries(".");
         return;
     }
-    else{
+    else {
         vector<string>temp;
-        char cwd[256];
-        string present=string(getcwd(cwd,256));
-        // string path=".";
-        space_split.pop();
         bool show_all=false;
         bool show_long=false;
-        while(!space_split.empty()){
-            string flag=space_split.front();
-            if(flag==".."||flag=="."){
-                temp.push_back(flag);
-            }
-            else if(flag=="~"){
-                temp.push_back(present);
-            }
-            else if(flag[0]=='-'){
+        argument.pop();
+        while (!argument.empty()){
+            string flag=argument.front();
+            argument.pop();
+            if(flag[0]=='-'){
                 for(int i=1;i<flag.size();++i){
                     if(flag[i]=='a'){
                         show_all=true;
@@ -252,37 +244,41 @@ void handle_ls(){
                         show_long=true;
                     }
                     else{
-                        cout<<"Invalid flag"<<endl;
+                        cout<< "Invalid flag"<<flag[i]<<endl;
                         return;
                     }
                 }
             }
-            else{
-                temp.push_back(flag);
-            }
-            space_split.pop();
-        }
-        if(temp.size()==0){
-            print_entries(".");
-        }
-        else{
-            for(int i=0;i<temp.size();++i){
-                if(temp.size()>=2){
-                    cout<<temp[i]<<":"<<endl;
-                }
-                if(show_all && show_long){
-                    print_all_long_format(temp[i]);
-                }
-                else if(show_all){
-                    print_all_entries(temp[i]);
-                }
-                else if(show_long){
-                    print_long_format(temp[i]);
+            else{ 
+                if(flag=="~"){
+                    char cwd[256];
+                    getcwd(cwd,sizeof(cwd));
+                    temp.push_back(string(cwd));
                 }
                 else{
-                    print_entries(temp[i]);
+                    temp.push_back(flag); 
                 }
             }
-        }        
+        }
+        if(temp.empty()){
+            temp.push_back(".");
+        }
+        for(int i=0;i<temp.size();++i){
+            if(temp.size()>1){
+                cout<<temp[i]<<":"<<endl;
+            }
+            if(show_all && show_long){
+                print_all_long_format(temp[i]);
+            }
+            else if(show_all){
+                print_all_entries(temp[i]);
+            }
+            else if(show_long){
+                print_long_format(temp[i]);
+            }
+            else{
+                print_entries(temp[i]);
+            }
+        }
     }
 }

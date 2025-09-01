@@ -7,6 +7,6 @@ extern queue<string>pipe_split;
 extern queue<string>space_split;
 extern string Home;
 
-void handle_ls();
-
+void handle_ls(queue<string>space_split);
+void handle_search(queue<string>space_split);
 #endif
