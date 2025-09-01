@@ -1,32 +1,106 @@
 #include<iostream>
 #include"header.h"
 #include<queue>
+#include<deque>
 #include<sys/utsname.h>
 #include<readline/readline.h>
 #include<readline/history.h>
+#include<sys/sysctl.h>
+#include<libproc.h>
 #include<unistd.h>
 using namespace std;
 string system_name;
 queue<string>command_split;
-queue<string>pipe_split;
 string Home;
+
+struct trackbg{
+    queue<string>arg;
+    bool bg=false;
+};
+
+void handle_foreground(queue<string>argument){
+    vector<char*>arg;
+    while(!argument.empty()){
+        string args=argument.front();
+        argument.pop();
+        arg.push_back(strdup(args.c_str()));
+    }
+    arg.push_back(nullptr);
+    int pid=fork();
+    if(pid<0){
+        perror("fork execution failed");
+        for(char* c:arg)free(c);
+        return;
+    }
+    else if(pid==0){
+        if(execvp(arg[0],arg.data())==-1){
+            perror("execvp execution failed");
+            return;
+        }
+    }
+    else{
+        int status;
+        waitpid(pid,&status,0);
+    }
+    for(char* c:arg){
+        free(c);
+    }
+}
+
+void handle_background(queue<string>argument){
+    vector<char*>arg;
+    while(!argument.empty()){
+        string args=argument.front();
+        argument.pop();
+        arg.push_back(strdup(args.c_str()));
+    }
+    arg.push_back(nullptr);
+    int pid=fork();
+    if(pid<0){
+        perror("fork execution failed");
+        for(char* c:arg)free(c);
+        return;
+    }
+    else if(pid==0){
+        if(execvp(arg[0],arg.data())==-1){
+            perror("execvp execution failed");
+            return;
+        }
+    }
+    else{
+        cout<<pid<<endl;
+    }
+    for(char* c:arg){
+        free(c);
+    }
+}
+
+int custom(string command){
+    if(command=="pwd")return 0;
+    if(command=="echo")return 0;
+    if(command=="ls")return 0;
+    if(command=="cd")return 0;
+    if(command=="search")return 0;
+    if(command=="pinfo")return 0;
+    return 1;
+}
 
 string curr_dir(){
     char cwd[256];
     return string(getcwd(cwd,256));
 }
 
-void handle_echo(queue<string>space_split){
-    space_split.pop();
-    while(!space_split.empty()){
-        cout<<space_split.front()<<" ";
-        space_split.pop();
+void handle_echo(queue<string>argument){
+    argument.pop();
+    while(!argument.empty()){
+        cout<<argument.front()<<" ";
+        argument.pop();
     }
     cout<<endl;
 }
 
-void handle_pwd(queue<string>space_split){
-    if(space_split.size()>1){
+void handle_pwd(queue<string>argument){
+    if(argument.size()>1){
         cout<<"invalid command"<<endl;
         return;
     }
@@ -69,18 +143,18 @@ void print_prompt()
     system_name=(string)u_name+"@"+host_name+":"+str;
 }
 
-void handle_cd(queue<string>space_split){
-    if(space_split.size()>2){
+void handle_cd(queue<string>argument){
+    if(argument.size()>2){
         cout<<"Invalid arguments"<<endl;
     }
-    else if(space_split.size()==1){
+    else if(argument.size()==1){
         if(chdir(Home.c_str())!=0){
             perror("cant reach home directory");
         }
     }
     else{
-        space_split.pop();
-        string flag=space_split.front();
+        argument.pop();
+        string flag=argument.front();
         if(flag==".."){
             if(chdir("..")!=0){
                 perror("chdir not executed");
@@ -90,7 +164,6 @@ void handle_cd(queue<string>space_split){
             const char* home = getenv("HOME");
             if(home==nullptr){
                 perror("Home is not fetched");
-                // clear_queue();
                 return;
             }
             if(chdir(home)!=0){
@@ -109,36 +182,123 @@ void handle_cd(queue<string>space_split){
             }   
         }
     }
-    // clear_queue();
 }
 
-void execute_command(queue<queue<string>> pipeline_args, bool background) {
-    while (!pipeline_args.empty()) {
-        queue<string>argument= pipeline_args.front();
-        pipeline_args.pop();
+void handle_pinfo(queue<string>argument){
+    argument.pop();
+    int temp;
+    if(argument.size()>=2){
+        cout<<"Invalid arguments"<<endl;
+        return;
+    }
+    int pid;
+    if(!argument.empty()){
+        pid=stoi(argument.front());
+        argument.pop();
+    }
+    else{
+        pid=getpid();
+    }
+    int x[4];
+    struct kinfo_proc p_info;
+    unsigned long pinfosize=sizeof(p_info);
+    x[0] = CTL_KERN;
+    x[1] = KERN_PROC;
+    x[2] = KERN_PROC_PID;
+    x[3] = pid;
+    temp=sysctl(x, 4, &p_info, &pinfosize, NULL, 0);
+    if(temp!=0){
+        cout<<"proces status not fetched"<<endl;
+        return;
+    }
+    char status='?';
+    if(p_info.kp_proc.p_stat==SRUN){
+        status='R';
+    }
+    else if(p_info.kp_proc.p_stat==SSLEEP){
+        status='S';
+    }
+    else if(p_info.kp_proc.p_stat==SZOMB){
+        status='Z';
+    }
+    else if(p_info.kp_proc.p_stat==SSTOP){
+        status='T';
+    }
+    int pgid=getpgid(pid);
+    if(pgid==-1){
+        perror("getpgid not executed");
+        return;
+    }
+    int fg_pid=tcgetpgrp(pid);
+    if(pgid==fg_pid){
+        cout<<"Process Status -- "<<status<<"+"<<endl;
+    }
+    else{
+        cout<<"Process Status -- "<<status<<endl;
+    }
+    struct proc_taskinfo tinfo;
+    temp=proc_pidinfo(pid,PROC_PIDTASKINFO,0,&tinfo,sizeof(tinfo));
+    if(temp<=0){
+        cout<<"cant get process info"<<endl;
+        return;
+    }
+    char path[PROC_PIDPATHINFO_MAXSIZE];
+    temp=proc_pidpath(pid,path,sizeof(path));
+    string exe_path=string(path);
+    if(temp<=0){
+        cout<<"Executable path cant fetched."<<endl;
+        return;
+    }
+    if(exe_path.size()>=Home.size()){
+        exe_path.replace(0,Home.size(),1,'~');
+    }    
+    unsigned long long virtual_mem=(unsigned long long)tinfo.pti_virtual_size;
+    cout<<"Memory -- "<<virtual_mem<<endl;
+    cout<<"Executable Path -- "<<exe_path<<endl;
+}
 
-        if (argument.empty()) continue;
+void execute_command(deque<trackbg>pipe_argument){
+    while (!pipe_argument.empty()){
+        trackbg current=pipe_argument.front(); 
+        pipe_argument.pop_front();
 
-        string cmd = argument.front();
-
-        if (cmd == "pwd") {
-            handle_pwd(argument);
+        queue<string>argument= current.arg;
+        bool background=current.bg;
+        if(background==true && argument.empty()){
+            cout<<"Invalid argumenst"<<endl;
+            return;
         }
-        else if (cmd == "cd") {
-            handle_cd(argument);
+        if(argument.empty()) continue;
+        if(background==true){
+            handle_background(argument);
         }
-        else if (cmd == "echo") {
-            handle_echo(argument);
+        else if(background!=true && custom(argument.front())){
+            handle_foreground(argument);
         }
-        else if (cmd == "ls") {
-            handle_ls(argument);
-        }
-        else if (cmd == "search") {
-            handle_search(argument);
-        }
-        else {
-            cout << "Invalid command " << cmd << endl;
-        }
+        else{
+            string cmd=argument.front();
+            if(cmd=="pwd"){
+                handle_pwd(argument);
+            }
+            else if(cmd=="cd"){
+                handle_cd(argument);
+            }
+            else if(cmd=="echo"){
+                handle_echo(argument);
+            }
+            else if(cmd=="ls"){
+                handle_ls(argument);
+            }
+            else if(cmd=="search"){
+                handle_search(argument);
+            }
+            else if(cmd=="pinfo"){
+                handle_pinfo(argument);
+            }
+            else{
+                cout<<"Invalid command "<<cmd<<endl;
+            }
+        }    
     }
 }
 
@@ -158,16 +318,7 @@ void parser(char *input){
     while(!command_split.empty()){
         string s=command_split.front();
         command_split.pop();
-
-        bool background = false;
-        if (!s.empty() && s.back() == '&') {
-            background = true;
-            s.pop_back(); 
-            while (!s.empty() && isspace(s.back())){ 
-                s.pop_back();
-            }
-        }
-
+        queue<string>pipe_split;
         char* command=new char[s.length()+1];
         strcpy(command,s.c_str());
         char* token2=strtok(command,delimiter2);
@@ -176,8 +327,7 @@ void parser(char *input){
             token2=strtok(nullptr,delimiter2);
         }
         delete[]command;
-
-        queue<queue<string>> pipe_argument;
+        deque<trackbg>pipe_argument;
         // Space seperated
         const char* delimiter3=" \t";
         while(!pipe_split.empty()){
@@ -186,77 +336,44 @@ void parser(char *input){
             char* command1=new char[s2.length()+1];
             strcpy(command1,s2.c_str());
             char* token3=strtok(command1,delimiter3);
-
-            queue<string>space;
-            string input_file = "";
-            string output_file = "";
-            bool append_mode = false;
-
+            trackbg tb;
+            string input="";
+            string output="";
+            bool append=false;
             while(token3!=nullptr){
                 string temp=string(token3);
-                if (temp == "<") {
-                    token3 = strtok(nullptr, delimiter3);
-                    if (token3) input_file = string(token3);
+                if(temp=="<"){
+                    token3=strtok(nullptr,delimiter3);
+                    if(token3!=nullptr)input=string(token3);
                 }
-                else if (temp == ">") {
-                    token3 = strtok(nullptr, delimiter3);
-                    if (token3) {
-                        output_file = string(token3);
-                        append_mode = false;
+                else if(temp==">"){
+                    token3=strtok(nullptr,delimiter3);
+                    if(token3!=nullptr){
+                        output=string(token3);
+                        append=false;
                     }
                 }
-                else if (temp == ">>") {
-                    token3 = strtok(nullptr, delimiter3);
-                    if (token3) {
-                        output_file = string(token3);
-                        append_mode = true;
+                else if(temp==">>"){
+                    token3=strtok(nullptr,delimiter3);
+                    if(token3!=nullptr){
+                        output=string(token3);
+                        append=true;
                     }
                 }
-                else {
-                    space.push(temp);
+                else if(temp=="&"){
+                    tb.bg=true;
                 }
-                token3 = strtok(nullptr, delimiter3);
+                else{
+                    tb.arg.push(temp);
+                }
+                token3=strtok(nullptr,delimiter3);
             }
-            pipe_argument.push(space);
-
-            // // *** CHANGED: Temporary print redirection info (for testing) ***
-            // if (!input_file.empty()) {
-            //     cout << "Input redirection: " << input_file << endl;
-            // }
-            // if (!output_file.empty()) {
-            //     cout << "Output redirection: " << output_file<< (append_mode ? " (append mode)" : " (overwrite mode)") << endl;
-            // }
-            // // To run each command handle
-            // while(!space_split.empty()){
-            //     if(space_split.front()=="pwd"){
-            //         handle_pwd();
-            //         break;    
-            //     }
-            //     if(space_split.front()=="echo"){
-            //         handle_echo();
-            //         break;
-            //     }
-            //     if(space_split.front()=="cd"){
-            //         handle_cd();
-            //         break;
-            //     }
-            //     if(space_split.front()=="ls"){
-            //         handle_ls();
-            //         clear_queue();
-            //         break;
-            //     }
-            //     if(space_split.front()=="search"){
-            //         handle_search();
-            //         clear_queue();
-            //     }
-            //     else{
-            //         cout<<"Invalid command"<<endl;
-            //         clear_queue();
-            //     }
-            // }
+            if(!tb.arg.empty()){
+                pipe_argument.push_back(tb);
+            }
             delete[] command1;
         }
-        execute_command(pipe_argument, background);
+        execute_command(pipe_argument);
     }    
 }
 
