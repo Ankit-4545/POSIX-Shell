@@ -10,7 +10,33 @@ int custom(string command){
     if(command=="cd")return 0;
     if(command=="search")return 0;
     if(command=="pinfo")return 0;
+    if(command=="exit")return 0;
     return 1;
+}
+
+void execute_inbuilt(queue<string>argument){
+    string cmd=argument.front();
+    if(cmd=="pwd"){
+        handle_pwd(argument);
+    }
+    else if(cmd=="cd"){
+        handle_cd(argument);
+    }
+    else if(cmd=="echo"){
+        handle_echo(argument);
+    }
+    else if(cmd=="ls"){
+        handle_ls(argument);
+    }
+    else if(cmd=="search"){
+        handle_search(argument);
+    }
+    else if(cmd=="pinfo"){
+        handle_pinfo(argument);
+    }
+    else if(cmd=="exit"){
+        exit(0);
+    }
 }
 
 void handle_foreground(queue<string>argument){
@@ -29,7 +55,7 @@ void handle_foreground(queue<string>argument){
     }
     else if(pid==0){
         if(execvp(arg[0],arg.data())==-1){
-            perror("execvp execution failed");
+            cout<<"Invalid Command"<<endl;
             return;
         }
     }

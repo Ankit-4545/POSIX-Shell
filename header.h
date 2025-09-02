@@ -25,9 +25,11 @@ struct trackbg{
     bool bg=false;
 };
 
+void execute_inbuilt(queue<string>argument);
 void handle_ls(queue<string>argument);
 void handle_search(queue<string>argument);
 void handle_echo(queue<string>argument);
+void handle_pinfo(queue<string>argument);
 void handle_ls(queue<string>argument);
 void handle_pwd(queue<string>argument);
 void handle_cd(queue<string>argument);

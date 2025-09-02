@@ -149,9 +149,11 @@ void handle_pinfo(queue<string>argument){
         perror("getpgid not executed");
         return;
     }
-    int fg_pid=tcgetpgrp(pid);
-    if(pgid==fg_pid){
-        cout<<"Process Status -- "<<status<<"+"<<endl;
+    if(pid==getpid()){
+        int fg_pid=tcgetpgrp(STDIN_FILENO);
+        if(pgid==fg_pid){
+            cout<<"Process Status -- "<<status<<"+"<<endl;
+        }
     }
     else{
         cout<<"Process Status -- "<<status<<endl;
@@ -172,7 +174,7 @@ void handle_pinfo(queue<string>argument){
     if(exe_path.size()>=Home.size()){
         exe_path.replace(0,Home.size(),1,'~');
     }    
-    unsigned long long virtual_mem=(unsigned long long)tinfo.pti_virtual_size;
+    unsigned long long virtual_mem=(unsigned long long)tinfo.pti_resident_size;
     cout<<"Memory -- "<<virtual_mem<<endl;
     cout<<"Executable Path -- "<<exe_path<<endl;
 }
@@ -180,9 +182,8 @@ void handle_pinfo(queue<string>argument){
 void execute_command(deque<trackbg>pipe_argument){
     if(pipe_argument.size()>=2){
         execute_pipe(pipe_argument);
+        return;
     }
-
-
     while (!pipe_argument.empty()){
         trackbg current=pipe_argument.front(); 
         pipe_argument.pop_front();
@@ -201,28 +202,7 @@ void execute_command(deque<trackbg>pipe_argument){
             handle_foreground(argument);
         }
         else{
-            string cmd=argument.front();
-            if(cmd=="pwd"){
-                handle_pwd(argument);
-            }
-            else if(cmd=="cd"){
-                handle_cd(argument);
-            }
-            else if(cmd=="echo"){
-                handle_echo(argument);
-            }
-            else if(cmd=="ls"){
-                handle_ls(argument);
-            }
-            else if(cmd=="search"){
-                handle_search(argument);
-            }
-            else if(cmd=="pinfo"){
-                handle_pinfo(argument);
-            }
-            else{
-                cout<<"Invalid command "<<cmd<<endl;
-            }
+            execute_inbuilt(argument);
         }    
     }
 }
