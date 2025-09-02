@@ -36,36 +36,36 @@ void execute_pipe(deque<trackbg>pipe_argument){
             exit(EXIT_FAILURE);
         }
         if(pid==0){
-            if(n>1){
-                if(i==0){
-                    if(dup2(pipefd[1],STDOUT_FILENO)==-1){
-                        perror("dup2 1 not executed");
-                        exit(EXIT_FAILURE);;
-                    }
-                }
-                else if(i==n-1){
-                    if(dup2(pipefd[2*(i-1)],STDIN_FILENO)==-1){
-                        cout << "Child " << i << ": dup2 pipefd[" << 2*(i-1) << "] = " << pipefd[2*(i-1)] << " to stdin\n";
-
-                        perror("dup2 2 not executed");
-                        exit(EXIT_FAILURE);;
-                    }
-                }
-                else{
-                    if(dup2(pipefd[2*(i-1)],STDIN_FILENO)==-1){
-                        perror("dup2 3 not executed");
-                        exit(EXIT_FAILURE);;
-                    }
-                    if(dup2(pipefd[2*i+1],STDOUT_FILENO)==-1){
-                        perror("dup2 4 not executed");
-                        exit(EXIT_FAILURE);;
-                    }
-                }
-                for(int j=0;j<size;++j){
-                    close(pipefd[j]);
+            if(i==0){
+                if(dup2(pipefd[1],STDOUT_FILENO)==-1){
+                    perror("dup2 not executed");
+                    exit(EXIT_FAILURE);;
                 }
             }
-            
+            else if(i==n-1){
+                if(dup2(pipefd[2*(i-1)],STDIN_FILENO)==-1){
+                    perror("dup2 not executed");
+                    exit(EXIT_FAILURE);;
+                }
+            }
+            else{
+                if(dup2(pipefd[2*(i-1)],STDIN_FILENO)==-1){
+                    perror("dup2 not executed");
+                    exit(EXIT_FAILURE);;
+                }
+                if(dup2(pipefd[2*i+1],STDOUT_FILENO)==-1){
+                    perror("dup2 not executed");
+                    exit(EXIT_FAILURE);;
+                }
+            }
+            for(int j=0;j<size;++j){
+                close(pipefd[j]);
+            }
+            // io handling
+            if(!pipe_argument[i].input.empty() || !pipe_argument[i].output.empty()){
+                io_redirection(pipe_argument[i].arg,pipe_argument[i].input,pipe_argument[i].output,pipe_argument[i].append);
+                exit(EXIT_SUCCESS);
+            }
             if(!custom(argument.front())){
                 handle_inbuilt(argument);
                 exit(EXIT_SUCCESS);

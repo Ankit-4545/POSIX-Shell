@@ -13,6 +13,7 @@
 #include<pwd.h>
 #include<grp.h>
 #include<time.h>
+#include<fcntl.h>
 #include<libproc.h>
 #include<unistd.h>
 #include<queue>
@@ -23,8 +24,12 @@ extern string Home;
 struct trackbg{
     queue<string>arg;
     bool bg=false;
+    string input="";
+    string output="";
+    bool append=false; 
 };
 
+void io_redirection(queue<string>argument,string input,string output,bool append);
 void execute_inbuilt(queue<string>argument);
 void handle_ls(queue<string>argument);
 void handle_search(queue<string>argument);

@@ -191,10 +191,14 @@ void execute_command(deque<trackbg>pipe_argument){
         queue<string>argument= current.arg;
         bool background=current.bg;
         if(background==true && argument.empty()){
-            cout<<"Invalid argumenst"<<endl;
+            cout<<"Invalid argument"<<endl;
             return;
         }
         if(argument.empty()) continue;
+        if(!current.input.empty()||!current.output.empty()){
+            io_redirection(argument,current.input,current.output,current.append);
+            return;
+        }
         if(background==true){
             handle_background(argument);
         }
@@ -242,27 +246,24 @@ void parser(char *input){
             strcpy(command1,s2.c_str());
             char* token3=strtok(command1,delimiter3);
             trackbg tb;
-            string input="";
-            string output="";
-            bool append=false;
             while(token3!=nullptr){
                 string temp=string(token3);
                 if(temp=="<"){
                     token3=strtok(nullptr,delimiter3);
-                    if(token3!=nullptr)input=string(token3);
+                    if(token3!=nullptr)tb.input=string(token3);
                 }
                 else if(temp==">"){
                     token3=strtok(nullptr,delimiter3);
                     if(token3!=nullptr){
-                        output=string(token3);
-                        append=false;
+                        tb.output=string(token3);
+                        tb.append=false;
                     }
                 }
                 else if(temp==">>"){
                     token3=strtok(nullptr,delimiter3);
                     if(token3!=nullptr){
-                        output=string(token3);
-                        append=true;
+                        tb.output=string(token3);
+                        tb.append=true;
                     }
                 }
                 else if(temp=="&"){
