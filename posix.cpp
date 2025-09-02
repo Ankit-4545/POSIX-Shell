@@ -1,89 +1,9 @@
 #include<iostream>
 #include"header.h"
-#include<queue>
-#include<deque>
-#include<sys/utsname.h>
-#include<readline/readline.h>
-#include<readline/history.h>
-#include<sys/sysctl.h>
-#include<libproc.h>
-#include<unistd.h>
 using namespace std;
 string system_name;
 queue<string>command_split;
 string Home;
-
-struct trackbg{
-    queue<string>arg;
-    bool bg=false;
-};
-
-void handle_foreground(queue<string>argument){
-    vector<char*>arg;
-    while(!argument.empty()){
-        string args=argument.front();
-        argument.pop();
-        arg.push_back(strdup(args.c_str()));
-    }
-    arg.push_back(nullptr);
-    int pid=fork();
-    if(pid<0){
-        perror("fork execution failed");
-        for(char* c:arg)free(c);
-        return;
-    }
-    else if(pid==0){
-        if(execvp(arg[0],arg.data())==-1){
-            perror("execvp execution failed");
-            return;
-        }
-    }
-    else{
-        int status;
-        waitpid(pid,&status,0);
-    }
-    for(char* c:arg){
-        free(c);
-    }
-}
-
-void handle_background(queue<string>argument){
-    vector<char*>arg;
-    while(!argument.empty()){
-        string args=argument.front();
-        argument.pop();
-        arg.push_back(strdup(args.c_str()));
-    }
-    arg.push_back(nullptr);
-    int pid=fork();
-    if(pid<0){
-        perror("fork execution failed");
-        for(char* c:arg)free(c);
-        return;
-    }
-    else if(pid==0){
-        if(execvp(arg[0],arg.data())==-1){
-            perror("execvp execution failed");
-            return;
-        }
-    }
-    else{
-        cout<<pid<<endl;
-    }
-    for(char* c:arg){
-        free(c);
-    }
-}
-
-int custom(string command){
-    if(command=="pwd")return 0;
-    if(command=="echo")return 0;
-    if(command=="ls")return 0;
-    if(command=="cd")return 0;
-    if(command=="search")return 0;
-    if(command=="pinfo")return 0;
-    return 1;
-}
 
 string curr_dir(){
     char cwd[256];
@@ -258,6 +178,11 @@ void handle_pinfo(queue<string>argument){
 }
 
 void execute_command(deque<trackbg>pipe_argument){
+    if(pipe_argument.size()>=2){
+        execute_pipe(pipe_argument);
+    }
+
+
     while (!pipe_argument.empty()){
         trackbg current=pipe_argument.front(); 
         pipe_argument.pop_front();

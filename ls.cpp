@@ -1,12 +1,4 @@
 #include<iostream>
-#include<vector>
-#include<unistd.h>
-#include<dirent.h>
-#include<iomanip>
-#include<sys/stat.h>
-#include<pwd.h>
-#include<grp.h>
-#include<time.h>
 #include"header.h"
 using namespace std;
 
@@ -244,7 +236,7 @@ void handle_ls(queue<string>argument){
                         show_long=true;
                     }
                     else{
-                        cout<< "Invalid flag"<<flag[i]<<endl;
+                        cout<< "Invalid flag"<<endl;
                         return;
                     }
                 }
