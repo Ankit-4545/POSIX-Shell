@@ -1,0 +1,15 @@
+cd ..
+cd
+history
+cd ..
+cd
+ls
+ls -l
+jdkf
+iefjo
+fewihjo
+history
+history
+history 5
+history
+git add .

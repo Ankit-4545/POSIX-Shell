@@ -60,7 +60,7 @@ void handle_foreground(queue<string>argument){
     else if(pid==0){
         if(execvp(arg[0],arg.data())==-1){
             cout<<"Invalid Command"<<endl;
-            return;
+            exit(1);
         }
     }
     else{

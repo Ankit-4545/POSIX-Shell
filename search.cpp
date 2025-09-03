@@ -12,21 +12,22 @@ void show_history(queue<string>argument){
         cout<<"Invalid argument"<<endl;
         return;
     }
-    if(hist.size()>=10) total=10;
-    else total=hist.size();
     if(argument.size()==1){
         total=stoi(argument.front());
-        if(total>20 || total>hist.size()){
+        if(total>history_length){
             cout<<"invalid range"<<endl;
             return;
         }
     }
-    int i=hist.size()-1;
-    int j=0;
-    while(j<total){
-        cout<<j+1<<": "<<hist[i]<<endl;
-        i--;
-        j++;
+    else{
+        total=10;
+    }
+    int start=max(0,history_length-total);
+    int num=0;
+    for (int i = start; i < history_length; ++i) {
+        HIST_ENTRY* entry = history_get(i + 1);
+        if (entry)
+            std::cout<<++num<<": "<<entry->line<<std::endl;
     }
 }
 

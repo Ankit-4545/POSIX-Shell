@@ -19,7 +19,6 @@
 #include<unistd.h>
 #include<queue>
 using namespace std;
-extern vector<string>hist;
 extern queue<string>command_split;
 extern string Home;
 
