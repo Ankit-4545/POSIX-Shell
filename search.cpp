@@ -6,7 +6,7 @@
 using namespace std;
 
 void show_history(queue<string>argument){
-    argument.pop();
+    if(!argument.empty())argument.pop();
     int total;
     if(argument.size()>=2){
         cout<<"Invalid argument"<<endl;
@@ -22,12 +22,18 @@ void show_history(queue<string>argument){
     else{
         total=10;
     }
-    int start=max(0,history_length-total);
+    int start;
+    if(history_length-total==0){
+        start=1;
+    }
+    else{
+        start=history_length-total+1;
+    }
     int num=0;
-    for (int i = start; i < history_length; ++i) {
-        HIST_ENTRY* entry = history_get(i + 1);
-        if (entry){
-            cout<<++num<<": "<<entry->line<<endl;
+    HIST_ENTRY** entry=history_list();
+    for (int i = start-1; i < history_length; ++i) {
+        if(entry){
+            cout<<++num<<": "<<entry[i]->line<<endl;
         }
     }
 }
