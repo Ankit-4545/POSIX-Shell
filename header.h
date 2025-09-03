@@ -14,6 +14,7 @@
 #include<grp.h>
 #include<time.h>
 #include<fcntl.h>
+#include<signal.h>
 #include<libproc.h>
 #include<unistd.h>
 #include<queue>

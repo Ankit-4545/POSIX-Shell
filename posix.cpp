@@ -294,7 +294,7 @@ void parser(char *input){
 void get_input(){
     rl_bind_key('\t', rl_complete);
     char *input=readline(system_name.c_str());
-    if(!input) return;
+    if(!input) exit(0);
     if(*input) add_history(input);
     parser(input);
     free (input);
@@ -302,7 +302,7 @@ void get_input(){
 
 int main(){
     char cwd[256];
-    Home=string(getcwd(cwd,256)); 
+    Home=string(getcwd(cwd,256));
     while(true){
         print_prompt();
         get_input();     
