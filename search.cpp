@@ -5,6 +5,31 @@
 #include"header.h"
 using namespace std;
 
+void show_history(queue<string>argument){
+    argument.pop();
+    int total;
+    if(argument.size()>=2){
+        cout<<"Invalid argument"<<endl;
+        return;
+    }
+    if(hist.size()>=10) total=10;
+    else total=hist.size();
+    if(argument.size()==1){
+        total=stoi(argument.front());
+        if(total>20 || total>hist.size()){
+            cout<<"invalid range"<<endl;
+            return;
+        }
+    }
+    int i=hist.size()-1;
+    int j=0;
+    while(j<total){
+        cout<<j+1<<": "<<hist[i]<<endl;
+        i--;
+        j++;
+    }
+}
+
 bool search(string curr,string file){
     DIR* dir=opendir(curr.c_str());
     if(dir==nullptr){

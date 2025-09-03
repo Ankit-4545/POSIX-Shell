@@ -18,6 +18,7 @@
 #include<unistd.h>
 #include<queue>
 using namespace std;
+extern vector<string>hist;
 extern queue<string>command_split;
 extern string Home;
 
@@ -41,5 +42,6 @@ void handle_cd(queue<string>argument);
 void handle_foreground(queue<string>argument);
 void handle_background(queue<string>argument);
 void execute_pipe(deque<trackbg>pipe_argument);
+void show_history(queue<string>argument);
 int custom(string command);
 #endif

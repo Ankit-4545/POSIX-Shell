@@ -11,6 +11,7 @@ int custom(string command){
     if(command=="search")return 0;
     if(command=="pinfo")return 0;
     if(command=="exit")return 0;
+    if(command=="history")return 0;
     return 1;
 }
 
@@ -33,6 +34,9 @@ void execute_inbuilt(queue<string>argument){
     }
     else if(cmd=="pinfo"){
         handle_pinfo(argument);
+    }
+    else if(cmd=="history"){
+        show_history(argument);
     }
     else if(cmd=="exit"){
         exit(0);

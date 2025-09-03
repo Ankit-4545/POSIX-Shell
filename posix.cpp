@@ -4,6 +4,7 @@ using namespace std;
 string system_name;
 queue<string>command_split;
 string Home;
+vector<string>hist;
 
 string curr_dir(){
     char cwd[256];
@@ -219,6 +220,13 @@ void parser(char *input){
     char* token=strtok(input_copy,delimiter);
     while(token!=nullptr){
         command_split.push(string(token));
+        if(hist.size()<20){
+            hist.push_back(string(token));
+        }
+        else{
+            hist.erase(hist.begin());
+            hist.push_back(string(token));
+        }
         token=strtok(nullptr,delimiter);
     }
     delete[]input_copy;
@@ -284,7 +292,7 @@ void parser(char *input){
 }
 
 void get_input(){
-    rl_bind_key('\t', rl_insert);
+    rl_bind_key('\t', rl_complete);
     char *input=readline(system_name.c_str());
     if(!input) return;
     if(*input) add_history(input);
