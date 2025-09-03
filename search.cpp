@@ -26,8 +26,9 @@ void show_history(queue<string>argument){
     int num=0;
     for (int i = start; i < history_length; ++i) {
         HIST_ENTRY* entry = history_get(i + 1);
-        if (entry)
-            std::cout<<++num<<": "<<entry->line<<std::endl;
+        if (entry){
+            cout<<++num<<": "<<entry->line<<endl;
+        }
     }
 }
 

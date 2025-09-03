@@ -3,7 +3,9 @@
 using namespace std;
 string system_name;
 queue<string>command_split;
+string old_dir;
 string Home;
+string new_dir;
 
 string curr_dir(){
     char cwd[256];
@@ -79,6 +81,8 @@ void handle_cd(queue<string>argument){
             if(chdir("..")!=0){
                 perror("chdir not executed");
             }
+            old_dir=new_dir;
+            new_dir=curr_dir();
         }
         else if(flag=="~"){
             const char* home = getenv("HOME");
@@ -89,17 +93,25 @@ void handle_cd(queue<string>argument){
             if(chdir(home)!=0){
                 perror("cant reach home directory");
             }
+            old_dir=new_dir;
+            new_dir=curr_dir();
         }
         else if(flag=="-"){
-            if(chdir("..")!=0){
-                perror("chdir not executed");
+            new_dir=curr_dir();
+            if(chdir(old_dir.c_str())!=0){
+                perror("no any previous directory");
+                return;
             }
-            cout<<curr_dir()<<endl;
+            old_dir=new_dir;
+            new_dir=curr_dir();
+            cout<<new_dir<<endl;
         }
         else{
             if(chdir(flag.c_str())!=0){
                 perror("invalid file path");
-            }   
+            }
+            old_dir=new_dir;
+            new_dir=curr_dir();   
         }
     }
 }
@@ -311,6 +323,7 @@ void get_input(){
 int main(){
     char cwd[256];
     Home=string(getcwd(cwd,256));
+    new_dir=Home;
     read_history("history.txt");
     while(true){
         print_prompt();

@@ -1,15 +1,20 @@
 cd ..
-cd
-history
+cd 
+cd -
+cd ..
+cd -
+cd -
+cd ..
 cd ..
 cd
-ls
-ls -l
-jdkf
-iefjo
-fewihjo
-history
-history
-history 5
-history
+cd -
+cd ..
+cd -
+cd -
+cd ..
+cd ..
+cd -
+cd -
+cd -
+cd -
 git add .
