@@ -1,20 +1,20 @@
-cat < pinfo
-cat < info.txt
-echo sjfisj > info.txt
-pinfo > info.txt
-pinfo > info.txt
-ls -l
-pinfo > info.txt
-ls > info.txt
-ls -l > info.txt
-pwd > info.txt
-echo Hello > info.txt
-cat jidfjos > info.txt
-cat info.txt > a.txt
-ls > info.txt
-cat info.txt > a.txt
 git add .
 git commit -m "final commit"
+git commit -m "final_commit"
 git push -u origin main
-git status
+ls -l | grep cpp &
+ls -l|grep cpp &
+ls l|grep cpp &
+ls l|grep .cpp &
+ls l
+ls l|grep cpp
+ls l|grep .cpp
+ls|grep cpp
+ls|grep cpp &
+ls | grep cpp &
+ls | grep cpp &
+gedit
+pinfo 74984
+gedit &
+pinfo 75041
 git add .

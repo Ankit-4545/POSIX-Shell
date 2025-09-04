@@ -58,14 +58,12 @@ void handle_foreground(queue<string>argument){
         return;
     }
     else if(pid==0){
-        // setpgid(0,0);
         if(execvp(arg[0],arg.data())==-1){
             cout<<"Invalid Command"<<endl;
             exit(1);
         }
     }
     else{
-        // setpgid(pid,pid);
         fgpid=pid;
         int status;
         waitpid(pid,&status,WUNTRACED);

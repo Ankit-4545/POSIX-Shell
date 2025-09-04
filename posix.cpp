@@ -10,7 +10,7 @@ string new_dir;
 
 void sigtstp_handler(int sig) {
     if (fgpid > 0) {
-        kill(fgpid, SIGTSTP);  // Send SIGTSTP to child
+        kill(fgpid, SIGTSTP); 
         cout<<"stopped "<<fgpid<<endl;
     }
 }
@@ -48,12 +48,10 @@ void handle_pwd(queue<string>argument){
     cout<<current_directory<<endl;
 }
 
-void print_prompt()
-{
-    char *u_name = getenv("USER");
-    if (u_name == nullptr)
-    {
-        cout << "User name not found" << endl;
+void print_prompt(){
+    char *u_name=getenv("USER");
+    if(u_name==nullptr){
+        cout<<"User name not found"<<endl;
     }
     string str;
     char cwd[256];
@@ -72,9 +70,8 @@ void print_prompt()
     }
     char host_name[256];
     int x = gethostname(host_name, 256);
-    if (x == -1)
-    {
-        cout << "User name can't be fetched" << endl;
+    if(x==-1){
+        cout<<"User name can't be fetched"<<endl;
         return;
     }
     system_name=(string)u_name+"@"+host_name+":"+str;
@@ -217,7 +214,6 @@ void execute_command(deque<trackbg>pipe_argument){
     while (!pipe_argument.empty()){
         trackbg current=pipe_argument.front(); 
         pipe_argument.pop_front();
-
         queue<string>argument= current.arg;
         bool background=current.bg;
         if(background==true && argument.empty()){
@@ -249,13 +245,6 @@ void parser(char *input){
     char* token=strtok(input_copy,delimiter);
     while(token!=nullptr){
         command_split.push(string(token));
-        // if(hist.size()<20){
-        //     hist.push_back(string(token));
-        // }
-        // else{
-        //     hist.erase(hist.begin());
-        //     hist.push_back(string(token));
-        // }
         token=strtok(nullptr,delimiter);
     }
     delete[]input_copy;
@@ -323,7 +312,6 @@ void parser(char *input){
 void get_input(){
     stifle_history(20);
     rl_bind_key('\t', rl_complete);
-
     static const string file="history.txt";
     char *input=readline(system_name.c_str());
     if(input==nullptr) {
@@ -336,7 +324,6 @@ void get_input(){
     }
     parser(input);
     free (input);
-    // exit(0);
 }
 
 int main(){
