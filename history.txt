@@ -1,11 +1,3 @@
-history
-historygdfhgjh
-jrtyu
-tfgh
-history
-history
-history
-history
 history 2
 history 4
 history 20
@@ -17,4 +9,12 @@ history 20
 history 2
 history 6
 history 20
+git add .
+git commit -m "commited"
+git push  -u origin main
+ls | cat > a.txt|sort
+gedit
+gedit
+gedit &
+gedit
 git add .

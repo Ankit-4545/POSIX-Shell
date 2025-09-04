@@ -3,9 +3,16 @@
 using namespace std;
 string system_name;
 queue<string>command_split;
+int fg_pid=-1;
 string old_dir;
 string Home;
 string new_dir;
+
+void sigint_handler(int sig) {
+    if (fg_pid > 0) {
+        kill(fg_pid, SIGINT);
+    }
+}
 
 string curr_dir(){
     char cwd[256];
@@ -316,14 +323,27 @@ void get_input(){
         add_history(input);
         write_history(file.c_str());
     }
-    parser(input);
-    free (input);
+    int pid=fork();
+    if(pid==0){
+        parser(input);
+        free (input);
+        exit(0);
+    }
+    else if(pid>0){
+        fg_pid=pid;
+        waitpid(pid,nullptr,0);
+        fg_pid=-1;
+    }
+    else{
+        perror("fork not executed");
+    }
 }
 
 int main(){
     char cwd[256];
     Home=string(getcwd(cwd,256));
     new_dir=Home;
+    signal(SIGINT, sigint_handler);
     read_history("history.txt");
     while(true){
         print_prompt();

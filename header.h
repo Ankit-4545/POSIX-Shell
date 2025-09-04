@@ -2,6 +2,7 @@
 #define function_h
 #include<vector>
 #include<queue>
+#include<csignal>
 #include<deque>
 #include<dirent.h>
 #include<iomanip>
