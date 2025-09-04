@@ -56,7 +56,9 @@ void io_redirection(queue<string>command,string input,string output,bool append)
         exit(EXIT_FAILURE);
     }
     else{
-        int stat;
-        waitpid(pid,&stat,0);
+        fg_pid=pid;
+        int status;
+        waitpid(pid,&status,WUNTRACED);
+        fg_pid=-1;
     }
 }

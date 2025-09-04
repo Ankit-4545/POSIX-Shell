@@ -64,8 +64,10 @@ void handle_foreground(queue<string>argument){
         }
     }
     else{
+        fg_pid=pid;
         int status;
-        waitpid(pid,&status,0);
+        waitpid(pid,&status,WUNTRACED);
+        fg_pid=-1;
     }
     for(int i=0;i<arg.size();++i){
         free(arg[i]);
