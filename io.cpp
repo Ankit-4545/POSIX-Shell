@@ -3,6 +3,7 @@
 using namespace std;
 
 void io_redirection(queue<string>command,string input,string output,bool append){
+    queue<string>command_copy=command;
     int pid=fork();
     if(pid<0){
         perror("fork not executed");
@@ -51,6 +52,10 @@ void io_redirection(queue<string>command,string input,string output,bool append)
             command.pop();
         }
         arg[n]=nullptr;
+        if(!custom(arg[0])){
+            execute_inbuilt(command_copy);
+            exit(EXIT_SUCCESS);
+        }
         execvp(arg[0],arg);
         perror("execvp failed to read");
         exit(EXIT_FAILURE);

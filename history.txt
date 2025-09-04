@@ -1,20 +1,20 @@
-gedit &
-pinfo 68432
-gedit &
-pinfo 68739
-gedit &
-pinfo 69036
-gedit
-gedit 
-gedit &
-pinfo 69571
-pinfo 69571
-pinfo 69571
-pinfo
-gedit &
-pinfo 69843
-pinfor 69843
-pinfo 69843
-gedit
-pinfo 69982
+cat < pinfo
+cat < info.txt
+echo sjfisj > info.txt
+pinfo > info.txt
+pinfo > info.txt
+ls -l
+pinfo > info.txt
+ls > info.txt
+ls -l > info.txt
+pwd > info.txt
+echo Hello > info.txt
+cat jidfjos > info.txt
+cat info.txt > a.txt
+ls > info.txt
+cat info.txt > a.txt
+git add .
+git commit -m "final commit"
+git push -u origin main
+git status
 git add .
