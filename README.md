@@ -19,6 +19,8 @@ The logic of executing pipe seperating command is implemented.
 IO redirection and redirection with pipeline is implemented in this file.
 ### makefile
 This file has the compilation logic of all the file at once.
+### history.txt
+This file is to store history across all session and to get history by using arrow key
 ## To start and run the shell:
 compile: make   
 To run:  ./a.out
