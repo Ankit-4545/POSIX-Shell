@@ -6,6 +6,7 @@ queue<string>command_split;
 int fgpid=-1;
 string old_dir;
 string Home;
+string hist;
 string new_dir;
 
 void sigtstp_handler(int sig) {
@@ -312,7 +313,7 @@ void parser(char *input){
 void get_input(){
     stifle_history(20);
     rl_bind_key('\t', rl_complete);
-    static const string file="history.txt";
+    static const string file=hist;
     char *input=readline(system_name.c_str());
     if(input==nullptr) {
         write_history(file.c_str());
@@ -332,7 +333,8 @@ int main(){
     new_dir=Home;
     signal(SIGINT, sigint_handler);
     signal(SIGTSTP,sigtstp_handler);
-    read_history("history.txt");
+    hist=Home+"/history.txt";
+    read_history(hist.c_str());
     while(true){
         print_prompt();
         get_input();   
