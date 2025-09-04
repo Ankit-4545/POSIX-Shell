@@ -181,6 +181,9 @@ void handle_pinfo(queue<string>argument){
         if(pgid==fg_pid){
             cout<<"Process Status -- "<<status<<"+"<<endl;
         }
+        else{
+            cout<<"Process Status -- "<<status<<endl;
+        }
     }
     else{
         cout<<"Process Status -- "<<status<<endl;

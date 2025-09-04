@@ -1,20 +1,20 @@
-gedit
-pinfo 66395
-gedit
 gedit &
-pinfo 66591
+pinfo 68432
+gedit &
+pinfo 68739
+gedit &
+pinfo 69036
+gedit
 gedit 
-pinfo 66917
+gedit &
+pinfo 69571
+pinfo 69571
+pinfo 69571
+pinfo
+gedit &
+pinfo 69843
+pinfor 69843
+pinfo 69843
 gedit
-pinfor 66973
-pinfo 66973
-gedit &
-pinfo 67077
-gedit &
-pinfo 67288
-gedit 
-exit
-git add .
-git commit -m "commited"
-git push -u origin main
+pinfo 69982
 git add .

@@ -58,12 +58,14 @@ void handle_foreground(queue<string>argument){
         return;
     }
     else if(pid==0){
+        // setpgid(0,0);
         if(execvp(arg[0],arg.data())==-1){
             cout<<"Invalid Command"<<endl;
             exit(1);
         }
     }
     else{
+        // setpgid(pid,pid);
         fgpid=pid;
         int status;
         waitpid(pid,&status,WUNTRACED);
@@ -89,6 +91,7 @@ void handle_background(queue<string>argument){
         return;
     }
     else if(pid==0){
+        setpgid(0,0);
         if(execvp(arg[0],arg.data())==-1){
             perror("execvp execution failed");
             return;
@@ -96,6 +99,8 @@ void handle_background(queue<string>argument){
     }
     else{
         cout<<pid<<endl;
+        setpgid(pid,pid);
+        fgpid=-1;
     }
     for(int i=0;i<arg.size();++i){
         free(arg[i]);
