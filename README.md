@@ -1,4 +1,4 @@
-# POSIX SHELL IMPLEMENTATION:
+# POSIX SHELL:
 The goal of this assignment is to build a custom interactive shell in C++ that accepts user commands, creates and manages new processes, and performs basic functions similar to a Unix shell.
 
 ## Files included:
