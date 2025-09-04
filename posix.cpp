@@ -3,21 +3,21 @@
 using namespace std;
 string system_name;
 queue<string>command_split;
-int fg_pid=-1;
+int fgpid=-1;
 string old_dir;
 string Home;
 string new_dir;
 
 void sigtstp_handler(int sig) {
-    if (fg_pid > 0) {
-        kill(fg_pid, SIGTSTP);  // Send SIGTSTP to child
-        cout<<"stopped "<<fg_pid<<endl;
+    if (fgpid > 0) {
+        kill(fgpid, SIGTSTP);  // Send SIGTSTP to child
+        cout<<"stopped "<<fgpid<<endl;
     }
 }
 
 void sigint_handler(int sig) {
-    if (fg_pid > 0) {
-        kill(fg_pid, SIGINT);
+    if (fgpid > 0) {
+        kill(fgpid, SIGINT);
         cout<<endl;
     }
 }

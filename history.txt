@@ -1,20 +1,20 @@
 gedit
 gedit
-ls
-vbcx
-fdvfd
+ls -la- ..
 gedit
-gedit
-printf "banana\napple\nbanana\ncarrot\n" > in.txt
-printf "banana\napple\nbanana\ncarrot\n" > in.txt
-gedit
-printf "banana\napple\nbanana\ncarrot\ncarrot\n" > in.txt
-cat < in.txt | sort | uniq > out.txt
-jhi
-gedit
-pinfo 63379
+pinfo 66395
 gedit
 gedit &
-gedit &
+pinfo 66591
+gedit 
+pinfo 66917
 gedit
+pinfor 66973
+pinfo 66973
+gedit &
+pinfo 67077
+gedit &
+pinfo 67288
+gedit 
+exit
 git add .

@@ -22,7 +22,7 @@
 using namespace std;
 extern queue<string>command_split;
 extern string Home;
-extern int fg_pid;
+extern int fgpid;
 
 struct trackbg{
     queue<string>arg;
