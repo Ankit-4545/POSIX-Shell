@@ -236,8 +236,10 @@ void handle_ls(queue<string>argument){
                         show_long=true;
                     }
                     else{
-                        cout<< "Invalid flag"<<endl;
-                        return;
+                        if(!show_all&&!show_long){
+                            cout<< "Invalid flag"<<endl;
+                            return;
+                        }    
                     }
                 }
             }
