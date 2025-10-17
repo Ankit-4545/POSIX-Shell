@@ -31,7 +31,17 @@ string curr_dir(){
 void handle_echo(queue<string>argument){
     argument.pop();
     while(!argument.empty()){
-        cout<<argument.front()<<" ";
+        string s="";
+        string cmd=argument.front();
+        for(auto i:cmd){
+            if(i=='"'){
+                continue;
+            }
+            else{
+                s+=i;
+            }
+        }
+        cout<<s<<" ";
         argument.pop();
     }
     cout<<endl;
